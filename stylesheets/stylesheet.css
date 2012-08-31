@@ -89,9 +89,28 @@ header h2 {
   min-height: 595px;
 }
 
-.inner {
+.sidebar {
+  width: 250px;
+  float: left;
+  padding-top: 55px;
+  padding-left: 35px;
+}
+
+.sidebar ul li {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.center {
   width: 620px;
   margin: 0 auto;
+  float: left;
+/*  text-align: center;*/
+}
+
+.inner {
+/*  text-align: left;*/
 }
 
 #container .inner img {
@@ -99,7 +118,9 @@ header h2 {
 }
 
 #downloads {
-  margin-bottom: 40px;
+  float: right;
+  margin-top: 35px;
+  padding-right: 35px;
 }
 
 a.button {
