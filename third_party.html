@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>tpkg: Application packaging and deployment</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="sidebar">
+        <strong>Documents:</strong>
+        <ul>
+          <li><a href="get_started.html">Get started</a></li>
+          <li><a href="configure.html">Configure</a></li>
+          <li><a href="package.html">Package</a></li>
+          <li><a href="third_party.html">Package 3rd party apps</a></li>
+          <li><a href="deploy.html">Deploy</a></li>
+          <li><a href="package_server.html">Package server</a></li>
+          <li><a href="reporting_server.html">Reporting server</a></li>
+          <li><a href="production.html">Production</a></li>
+          <li><a href="externals.html">Externals</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="develop/">Develop</a></li>
+        </ul>
+      </div>
+      
+      <div class="center">
+        <div class="inner">
+
+          <header>
+            <h1>tpkg</h1>
+            <h2>Application packaging and deployment</h2>
+          </header>
+
+          <hr>
+
+          <section id="main_content">
+            <p>
+Open Source and other 3rd party libraries and applications play an important
+role in many environments.  This page has best practices and tips for
+packaging 3rd party software.
+</p>
+
+<h2>Versioning</h2>
+
+<p>
+The version number of the package should match the upstream version number of
+the software being packaged.  The "package_version" number should be an
+integer starting at 1 that is incremented with each package build.  The
+package version reflects changes in the package, like the package directory
+structure, file permissions, any local additions to the package like init
+scripts, etc.
+</p>
+
+<h2>Dynamic Linking/Shared Libraries</h2>
+
+<p>
+This isn't specific to 3rd party libraries, but seems worth mentioning here.
+We do not recommend adding /opt/tpkg/lib or other directories to the system's
+linker configuration, nor do we recommend a global LD_LIBRARY_PATH variable.
+If you are building a package that is dynamically linked against libraries
+contained in other tpkgs you should use the -R or -rpath option to the linker
+to ensure the path to the library is contained in any executables you build.
+</p>
+
+<h2>Autoconf</h2>
+
+<p>
+Third party applications that manage builds via autoconf (i.e. have a
+./configure script) are generally easily packaged.  The set of steps to build
+a package of such an application generally runs like:
+</p>
+
+<pre>
+./configure --prefix=/opt/tpkg
+make
+pkgdir=`mktemp -d`
+mkdir $pkgdir/root
+make install DESTDIR=$pkgdir/root (or make install prefix=$pkgdir/reloc to make a relocatable package)
+Place an appropriate tpkg.yml/tpkg.xml in $pkgdir
+tpkg --make $pkgdir</pre>
+
+<p>
+See the <a href="https://github.com/tpkg/pkgs">pkgs git repo</a> for scripts
+we use to build packages of some common applications.
+</p>
+
+<h2>Ruby Gems</h2>
+
+<p>
+Gems can be packaged using the gem2tpkg utility distributed with tpkg.  Gems
+that don't require special options can be packaged as simply as
+<tt>gem2tpkg rails</tt>, or if you want a version other than the
+latest: <tt>gem2tpkg rails --version 2.1.2</tt>.  Any dependencies will
+automatically be packaged as well.  Check the BUILD script in any of the
+gem- directories in
+<a href="https://github.com/tpkg/pkgs">this directory in git</a> for more
+advanced examples.
+</p>
+
+<h2>Perl CPAN Modules</h2>
+
+<p>
+CPAN modules can be packaged using the cpan2tpkg utility distributed with
+tpkg.  Modules that don't require special options can be packaged as simply as
+<tt>cpan2tpkg File::Cat</tt>, or if you want a version other than the latest:
+<tt>cpan2tpkg File::Cat --version 1.1</tt>.  Currently dependencies are not
+automatically packaged (they should be, but it is not working).  Check the
+BUILD script in any of the cpan- directories in
+<a href="https://github.com/tpkg/pkgs">this directory in git</a> for more
+advanced examples.
+</p>
+
+          </section>
+
+        </div>
+      </div>
+
+      <section id="downloads" class="clearfix">
+        <a href="https://github.com/tpkg" id="view-on-github" class="button"><span>View on GitHub</span></a>
+      </section>
+    </div>
+  </body>
+</html>

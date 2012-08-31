@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>tpkg: Application packaging and deployment</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="sidebar">
+        <strong>Documents:</strong>
+        <ul>
+          <li><a href="get_started.html">Get started</a></li>
+          <li><a href="configure.html">Configure</a></li>
+          <li><a href="package.html">Package</a></li>
+          <li><a href="third_party.html">Package 3rd party apps</a></li>
+          <li><a href="deploy.html">Deploy</a></li>
+          <li><a href="package_server.html">Package server</a></li>
+          <li><a href="reporting_server.html">Reporting server</a></li>
+          <li><a href="production.html">Production</a></li>
+          <li><a href="externals.html">Externals</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="develop/">Develop</a></li>
+        </ul>
+      </div>
+      
+      <div class="center">
+        <div class="inner">
+
+          <header>
+            <h1>tpkg</h1>
+            <h2>Application packaging and deployment</h2>
+          </header>
+
+          <hr>
+
+          <section id="main_content">
+            <p>
+Tpkg includes a reporting server written in Ruby on Rails.  The reporting
+server is completely optional, the client will only report to it if
+<a href="configure.html">configured</a> to do so.  The server tracks which
+packages are installed and which machines they are installed on, so that if
+your security team wants to know who's running the vulnerable 1.57 version of
+widgetapp you can check in a central location.  If you want to start up the
+reporting app here's how to do so:
+</p>
+
+<ul>
+  <li>Install SQLite
+    <ul>
+      <li>Red Hat: <tt>yum install sqlite</tt></li>
+      <li>Mac OS X 10.5: Comes with the OS</li>
+      <li>Debian: <tt>apt-get install sqlite3 libsqlite3-dev</tt></li>
+      <li>OpenSuSE: Install following packages with Yast: <tt>sqlite3, sqlite3-devel</tt></li>
+      <li>FreeBSD: <tt>pkg_add -r sqlite3</tt></li>
+    </ul>
+  </li>
+  <li>Install Ruby
+    <ul>
+      <li>Red Hat: <tt>yum install ruby ruby-ri ruby-devel</tt></li>
+      <li>Mac OS X 10.5: Comes with the OS</li>
+      <li>Debian: <tt>apt-get install ruby ruby-dev rake</tt></li>
+      <li>FreeBSD: <tt>pkg_add -r ruby</tt></li>
+    </ul>
+  </li>
+  <li>Install Ruby Gems
+    <ul>
+      <li>Red Hat: RPM available from <a href="https://fedoraproject.org/wiki/EPEL">Extra Packages for Enterprise Linux (EPEL)</a></li>
+      <li>Mac OS X 10.5: Comes with the OS</li>
+      <li>Debian: <tt>apt-get install rubygems</tt></li>
+      <li>OpenSuse: Install with Yast: <tt>rubygems</tt>
+        <ul>
+          <li>then in a shell (as "root"):</li>
+          <li><tt>gem update --system</tt></li>
+          <li>(if it fails, try: <tt>gem install rubygems-update; update_rubygems</tt>)</li>
+          <li><tt>gem update</tt></li>
+        </ul>
+      </li>
+      <li>FreeBSD: <tt>pkg_add -r ruby18-gems</tt></li>
+      <li>Others: Download and install from main site: <a href="http://docs.rubygems.org/read/chapter/3">http://docs.rubygems.org/read/chapter/3</a></li>
+    </ul>
+  </li>
+  <li><tt>gem install rails -v 2.2.2</tt></li>
+  <li><tt>gem install mongrel</tt></li>
+  <li><tt>gem install sqlite3-ruby</tt></li>
+  <li><a href="https://github.com/tpkg/server/downloads">Download the tpkg server</a> and unpack it</li>
+  <li>Create database:
+    <ul>
+      <li><tt>cd tpkg/server &amp;&amp; rake db:migrate</tt></li>
+    </ul>
+  </li>
+  <li>Start the server:
+    <ul>
+      <li><tt>cd tpkg/server &amp;&amp; ruby script/server</tt></li>
+    </ul>
+  </li>
+</ul>
+
+<p>
+At this point you should be able to connect to
+<a href="http://localhost:3000/">http://localhost:3000/</a> and see the tpkg
+dashboard.  Check the dashboard after you've run tpkg on a client and see the
+results that the client reported.
+</p>
+
+<p>
+The reporting server also provides an interface for accepting package file
+uploads. The interface is accessible at
+<a href="http://localhost:3000/uploads/new">http://localhost:3000/uploads/new</a>.
+You can either upload there via a web-browser, or via a CLI that we provide
+<a href="https://github.com/tpkg/client/blob/master/bin/tpkg_uploader">tpkg_uploader</a>.
+By default, uploaded files are saved in /tmp/repo. Once the files are uploaded
+to your desired location, you can set up a
+<a href="package_server.html">package server</a> to serve out those files.
+</p>
+
+<h3>Configuring the Reporting Server</h3>
+
+<p>
+To configure the reporting server, edit the content of
+config/configuration_manager.yml. This configuration file is written using the
+format of the wonsys's configuration_manager rails plugin. See
+<a href="http://github.com/wonsys/configuration_manager">http://github.com/wonsys/configuration_manager</a>
+for more details on how to set up such config file. 
+</p>
+
+<p>
+Here's the explanation for the important configuration settings:
+</p>
+
+<ul>
+  <li>authentication_method: restful-authentication
+    <ul>
+      <li>
+        By default, we use the restful-authentication plugin for handling
+        user authentication. If you implemented your own authentication
+        system, use this flag to indicate which system you want to use.
+      </li>
+    </ul>
+  </li>
+  <li>upload_path: /tmp/repo/
+    <ul>
+      <li>
+        Where uploaded files are saved.
+      </li>
+    </ul>
+  </li>
+  <li>verify_upload: true
+    <ul>
+      <li>Whether or not to verify the uploaded file is a valid package
+        created by tpkg. If set to true, you also need to install tpkg
+        client/lib.
+      </li>
+    </ul>
+  </li>
+</ul>
+
+          </section>
+
+        </div>
+      </div>
+
+      <section id="downloads" class="clearfix">
+        <a href="https://github.com/tpkg" id="view-on-github" class="button"><span>View on GitHub</span></a>
+      </section>
+    </div>
+  </body>
+</html>

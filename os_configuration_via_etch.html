@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>tpkg: Application packaging and deployment</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="sidebar">
+        <strong>Documents:</strong>
+        <ul>
+          <li><a href="get_started.html">Get started</a></li>
+          <li><a href="configure.html">Configure</a></li>
+          <li><a href="package.html">Package</a></li>
+          <li><a href="third_party.html">Package 3rd party apps</a></li>
+          <li><a href="deploy.html">Deploy</a></li>
+          <li><a href="package_server.html">Package server</a></li>
+          <li><a href="reporting_server.html">Reporting server</a></li>
+          <li><a href="production.html">Production</a></li>
+          <li><a href="externals.html">Externals</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="develop/">Develop</a></li>
+        </ul>
+      </div>
+      
+      <div class="center">
+        <div class="inner">
+
+          <header>
+            <h1>tpkg</h1>
+            <h2>Application packaging and deployment</h2>
+          </header>
+
+          <hr>
+
+          <section id="main_content">
+            <p>
+This page documents how one site uses the tpkg externals feature in
+conjunction with <a href="http://etch.sourceforge.net/">etch</a>.
+</p>
+
+<h2>Overview</h2>
+
+<p>
+The tpkg for an application should encapsulate all files and configuration
+needed for the application to run on top of a generic base system in our
+environment. As such there is a mechanism for a tpkg to request custom OS
+configuration from our OS configuration management system
+<a href="http://etch.sourceforge.net/">Etch</a>. This is done through the
+"externals" section in tpkg.yml. Entries in "externals" trigger tpkg to call
+pre-defined external scripts that we provide, which in our case register
+requests with etch for the desired configuration and then run etch to activate
+that configuration. When a package is removed the external script is run to
+remove the request and run etch to deactivate the configuration.
+</p>
+
+<p>
+The general format of the externals section is:
+</p>
+
+<pre>externals:
+  - name: user
+    data: myuser
+  - name: nfs
+    datafile: nfsmountsfile
+  - name: sysctl
+    datascript: ./calculate_kernel_memory_settings</pre>
+    
+<p>
+The name field specifies the name of the external to call (see below for valid
+options). The data to pass to the external can either be specified inline via
+the "data" field, in an external file referenced via the "datafile" field, or
+an external script referenced via the "datascript" field. The script for
+datascript can be any form of valid executable, it should be contained in your
+package directory structure, and referenced with a path relative to the top of
+the package directory structure (i.e. the directory where tpkg.yml lives).
+Whatever your datascript script outputs will be fed to the tpkg external
+script. We envision this being particularly useful in calculating kernel
+parameters based on things like the amount of physical memory in a system.
+</p>
+
+<h2>Supported Externals</h2>
+
+<h3>User</h3>
+<pre>
+  externals:
+  - name: user
+    data: myuser
+  - name: user
+    group:mygroup</pre>
+    
+<p>
+Requests that etch add the specified user to /etc/passwd and /etc/shadow. The
+user must already exist in our database, either as a human or as an
+application account defined though the SingleSignOn system. If the request is
+for group:mygroup then all members of the mygroup group will be added.
+Requests for groups and human users will only be honored on non-production
+systems.
+</p>
+
+<h3>Group</h3>
+
+<pre>
+  externals:
+  - name: group
+    data: mygroup</pre>
+
+<p>
+Requests that etch add the specified group to /etc/group. This is currently a
+no-op in our environment as etch always adds all groups to all systems.
+However, feel free to include this in your package as documentation that your
+package requires a particular group, and on the off chance that the etch
+behavior changes at some point in the future (highly unlikely).
+</p>
+
+<h3>Sudo</h3>
+
+<pre>
+  externals:
+  - name: sudo   
+    data: myuser
+  - name: sudo
+    data: group:mygroup</pre>
+
+<p>
+Requests that etch give the specified user sudo privileges. You should
+probably also have a user external to add the user's account. If the request
+is for group:mygroup then all members of the mygroup group will be given
+privileges. Requests for sudo privileges will only be honored on non-production systems.
+</p>
+
+<h3>NFS</h3>
+
+<pre>
+  externals:
+  - name: nfs
+    data: mymount nfsserver:/path/to/mount
+</pre>
+
+<p>
+Adds the specified entry to /etc/auto.auto, thus creating an automount point
+under /auto. This is our standard location for NFS mounts. The entry is added
+to /etc/auto.auto as is, so any valid automount options and syntax can be
+specified.
+</p>
+
+<h3>Sysctl</h3>
+
+<pre>
+  externals:
+  - name: sysctl
+    data: kernel.bogus = 0</pre>
+
+<p>
+Adds the specified entry to /etc/sysctl.conf, used for setting kernel parameters.
+</p>
+
+<h3>IPtables</h3>
+
+<pre>
+  externals:
+  - name: iptables
+    data: 
+&lt;filter&gt;
+-A INPUT -m tcp -p tcp --dport ssh --syn -j ACCEPT
+&lt;/filter&gt;
+&lt;nat&gt;
+-A PREROUTING -p tcp -m tcp --dport 80 -j REDIRECT --to-ports 4000
+-A OUTPUT -o lo -p tcp -m tcp --dport 80 -j REDIRECT --to-ports 4000
+&lt;/nat&gt;
+</pre>
+
+<p>
+Adds the specified entries to /etc/sysconfig/iptables, used for packet
+filtering.  Entries within &lt;filter&gt; are added to the *filter section in
+the config file.  This is the most common usage, these rules are used to
+filter packets.  Entries within &lt;nat&gt; are added to the *nat section of
+the config file.  This is not as frequently used, but can be used to redirect
+packets from one port to another port and various forms of NAT and PAT.
+</p>
+
+<h3>Limits</h3>
+
+<pre>
+  externals:
+  - name: limits
+    data: myuser hard nofile 4096</pre>
+
+<p>
+Adds the specified entries to /etc/security/limits.conf, used for controlling
+various per-user limits like number of open filehandles and number of processes.
+</p>
+
+          </section>
+
+        </div>
+      </div>
+
+      <section id="downloads" class="clearfix">
+        <a href="https://github.com/tpkg" id="view-on-github" class="button"><span>View on GitHub</span></a>
+      </section>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>tpkg: Application packaging and deployment</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="sidebar">
+        <strong>Documents:</strong>
+        <ul>
+          <li><a href="get_started.html">Get started</a></li>
+          <li><a href="configure.html">Configure</a></li>
+          <li><a href="package.html">Package</a></li>
+          <li><a href="third_party.html">Package 3rd party apps</a></li>
+          <li><a href="deploy.html">Deploy</a></li>
+          <li><a href="package_server.html">Package server</a></li>
+          <li><a href="reporting_server.html">Reporting server</a></li>
+          <li><a href="production.html">Production</a></li>
+          <li><a href="externals.html">Externals</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="develop/">Develop</a></li>
+        </ul>
+      </div>
+      
+      <div class="center">
+        <div class="inner">
+
+          <header>
+            <h1>tpkg</h1>
+            <h2>Application packaging and deployment</h2>
+          </header>
+
+          <hr>
+
+          <section id="main_content">
+            <p>
+Here's an example crontab for use on systems that support
+/etc/cron.d style crontabs.  See the
+<a href="packaging.html">packaging documentation</a> for more
+details about incorporating a crontab into a package.
+</p>
+
+<pre>
+MAILTO="root"
+30 2 * * *  root  /path/to/some/script
+
+MAILTO="joeuser@example.com"
+5 * * * *   nobody  /path/to/other/script</pre>
+
+<p>
+Consult your system's cron documentation for further details.
+</p>
+
+          </section>
+
+        </div>
+      </div>
+
+      <section id="downloads" class="clearfix">
+        <a href="https://github.com/tpkg" id="view-on-github" class="button"><span>View on GitHub</span></a>
+      </section>
+    </div>
+  </body>
+</html>

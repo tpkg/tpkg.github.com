@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>tpkg: Application packaging and deployment</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="sidebar">
+        <strong>Documents:</strong>
+        <ul>
+          <li><a href="get_started.html">Get started</a></li>
+          <li><a href="configure.html">Configure</a></li>
+          <li><a href="package.html">Package</a></li>
+          <li><a href="third_party.html">Package 3rd party apps</a></li>
+          <li><a href="deploy.html">Deploy</a></li>
+          <li><a href="package_server.html">Package server</a></li>
+          <li><a href="reporting_server.html">Reporting server</a></li>
+          <li><a href="production.html">Production</a></li>
+          <li><a href="externals.html">Externals</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="develop/">Develop</a></li>
+        </ul>
+      </div>
+      
+      <div class="center">
+        <div class="inner">
+
+          <header>
+            <h1>tpkg</h1>
+            <h2>Application packaging and deployment</h2>
+          </header>
+
+          <hr>
+
+          <section id="main_content">
+            <h2>Package Repository</h2>
+
+<p>
+Set up a <a href="package_server.html">package server</a>.  If you have more
+than one colo/datacenter/server room set up a duplicate package server in one
+of the secondary locations and rsync the repository to the secondary server
+regularly. This allows you to continue to perform deployments in the event
+that you lose the primary datacenter. 
+</p>
+
+<p>
+If you've set up the reporting server then packages can be uploaded via
+<a href="http://tpkg/uploads/new">http://tpkg/uploads/new</a>.  The directory
+where uploaded packages will be saved can be configured via the "upload_path"
+parameter of the <a href="reporting_server.html">reporting server</a>'s
+configuration file.
+</p>
+
+<h2>Reporting Server</h2>
+
+<p>
+Set up a <a href="reporting_server.html">reporting server</a>.
+</p>
+
+          </section>
+
+        </div>
+      </div>
+
+      <section id="downloads" class="clearfix">
+        <a href="https://github.com/tpkg" id="view-on-github" class="button"><span>View on GitHub</span></a>
+      </section>
+    </div>
+  </body>
+</html>

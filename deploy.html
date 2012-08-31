@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>tpkg: Application packaging and deployment</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="sidebar">
+        <strong>Documents:</strong>
+        <ul>
+          <li><a href="get_started.html">Get started</a></li>
+          <li><a href="configure.html">Configure</a></li>
+          <li><a href="package.html">Package</a></li>
+          <li><a href="third_party.html">Package 3rd party apps</a></li>
+          <li><a href="deploy.html">Deploy</a></li>
+          <li><a href="package_server.html">Package server</a></li>
+          <li><a href="reporting_server.html">Reporting server</a></li>
+          <li><a href="production.html">Production</a></li>
+          <li><a href="externals.html">Externals</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="develop/">Develop</a></li>
+        </ul>
+      </div>
+      
+      <div class="center">
+        <div class="inner">
+
+          <header>
+            <h1>tpkg</h1>
+            <h2>Application packaging and deployment</h2>
+          </header>
+
+          <hr>
+
+          <section id="main_content">
+            <p>
+The deployment feature of tpkg allows you to perform a variety of
+tpkg operations on a list of machines. This is done by running tpkg
+with the --servers or -s flag, follows by a comma-separated list of
+machines that you want to perform the operations on. Please note
+that this need to be executed from a machine that can ssh to all of
+the machines in your list of targets.
+</p>
+
+<h3>Example:</h3>
+
+<p>
+To install package "foo":
+<pre>tpkg -i foo -s server1,server2,server3</pre>
+This assumes that the package has already been uploaded to the repo.
+See the
+<a href="package_server.html">package server documentation</a> for
+information on how to set up your repo, and see the
+<a href="configuration.html">configuration documentation</a> for
+information on how to point tpkg to a particular repo.
+</p>
+
+<p>
+To install a package from a URL:
+<pre>tpkg -i http://example.com/repository/foo.tpkg -s server1,server2,server3</pre>
+</p>
+
+<p>
+To remove package:
+<pre>tpkg -r foo -s server1,server2,server3</pre>
+</p>
+
+<p>
+To start a package init script:
+<pre>tpkg --start foo -s server1,server2,server3</pre>
+</p>
+
+<p>
+To see what packages are installed:
+<pre>tpkg --qa -s server1,server2,server3</pre>
+</p>
+
+<p>
+If you want to deploy the packages as a user that is different from the login user:
+<pre>--deploy-as username</pre>
+</p>
+
+<p>
+For automation purposes, you can set up an ssh key, and tell tpkg to use it
+via the following option.  Note that tpkg may still need to prompt you for a
+sudo password.
+<pre>--use-ssh-key</pre>
+</p>
+
+          </section>
+
+        </div>
+      </div>
+
+      <section id="downloads" class="clearfix">
+        <a href="https://github.com/tpkg" id="view-on-github" class="button"><span>View on GitHub</span></a>
+      </section>
+    </div>
+  </body>
+</html>
