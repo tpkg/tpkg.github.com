@@ -1,0 +1,23 @@
+<h2>Package Repository</h2>
+
+<p>
+Set up a <a href="package_server.html">package server</a>.  If you have more
+than one colo/datacenter/server room set up a duplicate package server in one
+of the secondary locations and rsync the repository to the secondary server
+regularly. This allows you to continue to perform deployments in the event
+that you lose the primary datacenter. 
+</p>
+
+<p>
+If you've set up the reporting server then packages can be uploaded via
+<a href="http://tpkg/uploads/new">http://tpkg/uploads/new</a>.  The directory
+where uploaded packages will be saved can be configured via the "upload_path"
+parameter of the <a href="reporting_server.html">reporting server</a>'s
+configuration file.
+</p>
+
+<h2>Reporting Server</h2>
+
+<p>
+Set up a <a href="reporting_server.html">reporting server</a>.
+</p>

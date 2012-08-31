@@ -1,0 +1,29 @@
+#!/usr/bin/env ruby
+
+require 'find'
+require 'erb'
+require 'fileutils'
+
+@inputdir = ARGV[0] || Dir.pwd
+@outputdir = ARGV[1] || File.dirname(@inputdir)
+
+def process_file
+  ERB.new(File.read(File.join(@inputdir, 'layout.html.erb'))).result(binding)
+end
+
+Find.find(Dir.pwd) do |path|
+  if path[-5..-1] == '.html'
+    # next unless path =~ /faq.html/
+    puts "Processing #{path}"
+    # result = process_file(path {File.read(path)})
+    result = process_file {File.read(path)}
+    # puts result
+    outputfile = File.join(@outputdir, path.sub(@inputdir, ''))
+    puts "Writing result to #{outputfile}"
+    FileUtils.mkdir_p(File.dirname(outputfile))
+    File.open(outputfile, 'w') do |file|
+      file.write result
+    end
+  end
+end
+

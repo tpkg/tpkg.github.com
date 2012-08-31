@@ -1,0 +1,56 @@
+<p>
+  Here's an example init script for use in a tpkg.  See the
+  <a href="package.html">packaging documentation</a> for more details about
+  incorporating an init script into a package. 
+</p>
+
+<pre>
+#!/bin/sh
+
+case "$1" in
+'start')
+	# Start nginx
+	/opt/tpkg/sbin/nginx -c /opt/tpkg/myapp/config/nginx.conf
+	;;
+'stop')
+	# Stop nginx
+	if [ -f /opt/tpkg/var/run/nginx.pid ]
+	then
+		kill `cat /opt/tpkg/var/run/nginx.pid`
+		rm -f /opt/tpkg/var/run/nginx.pid
+	fi
+	;;
+'restart')
+	$0 stop
+	$0 start
+	;;
+'reload')
+	# Tell nginx to reload its configuration
+	if [ -f /opt/tpkg/var/run/nginx.pid ]
+	then
+		kill -HUP `cat /opt/tpkg/var/run/nginx.pid`
+	fi
+	;;
+'status')
+	if [ -f /opt/tpkg/var/run/nginx.pid ]
+	then
+		pid=`cat /opt/tpkg/var/run/nginx.pid`
+		if ps -e | grep $pid &gt; /dev/null 2&gt;&amp;1
+		then
+			echo "nginx (pid $pid) is running..."
+			exit 0
+		else
+			echo "nginx dead but pid file exists"
+			exit 1
+		fi
+	else
+		echo "nginx is stopped"
+		exit 3
+	fi
+	;;
+*)
+	echo "Usage: $0 { start | stop | restart }"
+	exit 1
+	;;
+esac
+exit 0</pre>

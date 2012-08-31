@@ -1,0 +1,195 @@
+<dl>
+
+<dt>
+Where should I ask questions or make suggestions?
+</dt>
+<dd>
+<p>
+The <a href="https://lists.sourceforge.net/lists/listinfo/tpkg-users">tpkg-users</a> mailing list
+</p>
+</dd>
+
+<dt>
+Surely this already exists?
+</dt>
+<dd>
+<p>
+Despite extensive searching we couldn't find an existing project that was
+close enough to what we had in mind.  We know of a few large companies that
+have similar tools internally, but they have not released the tools as open
+source.
+</p>
+<p>
+We considered using an existing, widely used packaging and deployment system
+like dpkg/apt or rpm/yum, but decided that was not ideal for a couple of
+reasons.  One of our requirements is a packaging environment that is separate
+from the operating system packaging environment for the reasons giving in the
+<a href="/">introduction</a>.  While it is possible to run multiple instances
+of, for example, rpm on the same box that is generally a recipe for confusion
+and errors:  "Oh, I see the problem, you used /usr/bin/rpm instead of /opt/local/bin/rpm."
+</p>
+<p>
+We also considered <a href="http://www.gnu.org/software/swbis/">swbis</a>,
+a GNU project which implements a POSIX packaging standard.  That project has
+the advantage (for our purposes) of not being a widely used OS packaging tool,
+but on the flip side is much less widely used and less well developed.
+</p>
+</dd>
+
+<dt>
+What platforms does it work on?
+</dt>
+<dd>
+<p>
+Most common forms on Unix should work.  You need Ruby, the
+<a href="http://reductivelabs.com/products/facter/">facter</a> library
+(available via rubygems), and GNU or BSD tar.  It is known to work on Red Hat
+Enterprise Linux, CentOS, Debian, Ubuntu, FreeBSD and Solaris.  It has also
+been lightly tested on Windows under cygwin.
+</p>
+</dd>
+
+<dt>
+What is the package format?
+</dt>
+<dd>
+<p>
+A tarball with a particular directory structure and a YAML metadata file.  At
+runtime tpkg will search your path for a modern version of tar (bsdtar or GNU
+tar for example) so that long filenames are supported.  See the
+<a href="/develop/internals.html">tpkg internals documentation</a> for more
+information.
+</p>
+</dd>
+
+<dt>
+Why tar?
+</dt>
+<dd>
+<p>
+The two widely available and commonly used file archiving formats are tar and
+zip.  There are other formats like cpio that are commonly available on Unix
+but less so on Windows.  Tar and zip both have advantages and disadvantages.
+Tar has native support for Unix permissions and is more likely to be installed
+on even a minimal Unix install than the zip utilities.  On the negative side
+for tar are the lack of support for random access within the archive and a
+handful of different standards for modern archive formats that support longer
+filenames, etc.  In the end the more "unixy" tar was selected.
+</p>
+</dd>
+
+<dt>
+Why use tpkg instead of Capistrano or Vlad the Deployer?
+</dt>
+<dd>
+<p>
+Tpkg provides many features not available in cap or vlad. File encryption is
+essential for deploying the database.yml file in Rails apps, along with any
+SSL keys needed. Rails, via bundler, provides support for installing gem
+dependencies, but tpkg can handle any kind of dependency, so you can pull in
+nginx or Apache, MySQL, or other non-gem dependencies. Tpkg's
+<a href="externals.html">externals support</a> can tie into an OS config
+management system to configure accounts or other OS settings required by your
+application. Init script support in tpkg means you can easily have your
+application start at system boot time.  A logrotate package is available for
+easy log rotation.  All of these features could be implemented in your cap or
+vlad configuration, but standard implementations are not readily available and
+your implementation has to be cut-n-pasted or otherwise separately maintained
+if you have multiple projects.
+</p>
+</dd>
+
+<dt>
+How do I specify a version number during install/remove/upgrade?
+</dt>
+<dd>
+<p>
+Use the following syntax:
+</p>
+<pre>pkgname=versionnumber[=packageversionnumber]</pre>
+<p>
+For example:
+</p>
+<pre>tpkg -i testpkg=2.4=4</pre>
+<p>
+The package version is optional, so if any package version of testpkg 2.4 is
+acceptable, or testpkg doesn't have package versions, then this syntax will work:
+</p>
+<pre>tpkg -i testpkg=2.4</pre>
+<p>
+Inequalities (&lt;=, &gt;=) are also supported.  This syntax was partially
+borrowed from apt-get.
+</p>
+</dd>
+
+<dt>
+How do I downgrade a package to an older version?
+</dt>
+<p>
+You can use the --downgrade option of tpkg. For example, if you want to
+downgrade your pkg fubar to version 1.1, package version 2, run one of the
+following commands.
+</p>
+<p>
+If the package is in the repository:
+</p>
+<pre>tpkg --downgrade=fubar=1.1=2</pre>
+<p>
+If you have the package file locally:
+</p>
+<pre>tpkg --downgrade=/mydir/mypath/fubar-1.1-2.tpkg</pre>
+
+<dt>
+Are there pre-built packages for common applications like Ruby, Perl or Apache?
+</dt>
+<dd>
+<p>
+Not yet.  We have a primitive set of build scripts for building packages of
+common applications like these.  See
+<a href="https://github.com/tpkg/pkgs">pkgs</a>.  See our
+<a href="/develop/help_needed.html">help needed</a> page for some notes on how
+we'd like to improve on this.
+</p>
+</dd>
+
+<dt>
+Does tpkg ignore .svn/.git/etc. when making a package?
+</dt>
+<dd>
+<p>
+No.  The primary reason (in the case of svn users at least) is to encourage
+users to build packages from an svn export rather than a working copy.  This
+helps ensure that packages are not accidentally built with uncommitted
+changes.  By using an export from svn you know your package only includes
+files under revision control.
+</p>
+</dd>
+
+<dt>
+Does tpkg work on Windows?
+</dt>
+<dd>
+<p>
+It has been tested under cygwin.  Support under native Windows, i.e. using
+<a href="http://rubyinstaller.org/">RubyInstaller</a> and
+<a href="http://gnuwin32.sourceforge.net/packages/libarchive.htm">bsdtar</a>,
+is a work in progress.
+</p>
+</dd>
+
+<dt>
+Why is it called tpkg?
+</dt>
+<dd>
+<p>
+We wanted a meaningful name so that folks who don't work with tpkg on a
+regular basis, like project managers, have an easier time remembering the
+name.  For tpkg that meant variants of pack, package, inst, install, etc.  We
+settled on pkg as short, easily typed, etc.  Most of the &lt;one letter&gt;pkg
+names were already taken by other projects, mostly package managers for little
+specialized Linux distros.  tpkg and a few others were available, and tpkg
+seemed the easiest of those to say and remember.
+</p>
+</dd>
+
+</dl>

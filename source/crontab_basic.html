@@ -1,0 +1,16 @@
+<p>
+Here's an example crontab for use on systems that do not support
+/etc/cron.d style crontabs.  The jobs will run as the user specified
+in tpkg.yml.  If that happens to be root then you could use
+su or sudo to run individual jobs as other users.  See the
+<a href="packaging.html">packaging documentation</a> for more
+details about incorporating a crontab into a package.
+</p>
+
+<pre>
+30 2 * * *  /path/to/some/script
+5 * * * *   /path/to/other/script</pre>
+
+<p>
+Consult your system's cron documentation for further details.  In particular note that Solaris and possibly other systems do not allow blank lines in crontabs.
+</p>

@@ -1,0 +1,17 @@
+<p>
+Here's an example crontab for use on systems that support
+/etc/cron.d style crontabs.  See the
+<a href="packaging.html">packaging documentation</a> for more
+details about incorporating a crontab into a package.
+</p>
+
+<pre>
+MAILTO="root"
+30 2 * * *  root  /path/to/some/script
+
+MAILTO="joeuser@example.com"
+5 * * * *   nobody  /path/to/other/script</pre>
+
+<p>
+Consult your system's cron documentation for further details.
+</p>

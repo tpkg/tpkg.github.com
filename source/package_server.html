@@ -1,0 +1,16 @@
+<p>
+To create a tpkg repository you just need a directory of tpkgs and run
+<tt>tpkg --extract /that/directory</tt>.  Then make that directory available
+via any web server.  Re-run the <tt>tpkg --extract</tt> any time you add or
+remove packages from the directory.
+</p>
+
+<p>
+See the <a href="configure.html">configuration documentation</a> for info
+about pointing clients at the URL for your repository.
+</p>
+
+<p>
+<tt>tpkg --extract</tt> will create a metadata.yml file in the directory with
+the metadata extracted from each package.
+</p>

@@ -1,0 +1,81 @@
+<p>
+tpkg has a mechanism for packages to make requests to other applications on
+the system where a package is installed.  The package specifies the name of
+the external hook to call and some data to send to that hook.  When the
+package is installed, upgraded or removed the external hook script is executed
+and passed the name of the package, the action being performed, and the data
+associated with that hook in the package.  Tpkg includes some example scripts
+and you can write additional scripts that are appropriate for your environment.
+</p>
+
+<p>
+The primary use case for this feature is to integrate with an OS configuration
+management tool like etch, puppet or cfengine.  The tpkg for an application
+should encapsulate all files and configuration needed for the application to
+run on top of a generic base system in your environment.  This may include OS
+configuration items like user accounts, kernel settings or NFS mounts.  If
+your OS configuration tool is managing those settings your package may need to
+interact with it to get those configuration items activated.  If your package
+tried to manipulate those settings directly (modifying /etc/passwd directly,
+for example) the OS configuration management tool may undo those changes,
+depending on how it is configured.  With the externals feature you can create
+an arrangement where those configuration changes are submitted as requests to
+the OS config tool, which is then called to activate those requests.
+</p>
+
+<h2>Package Configuration</h2>
+
+<p>
+The general format of the externals section in a package's tpkg.yml file is:
+</p>
+
+<pre>
+externals:
+  - name: user
+    data: myuser
+  - name: nfs
+    datafile: nfsmountsfile
+  - name: sysctl
+    datascript: ./calculate_kernel_memory_settings</pre>
+
+<p>
+The name field specifies the name of the external to call. The data to pass to
+the external can either be specified inline via the "data" field, in an
+external file referenced via the "datafile" field, or an external script
+referenced via the "datascript" field. The script for datascript can be any
+form of valid executable, it should be contained in your package directory
+structure, and referenced with a path relative to the top of the package
+directory structure (i.e. the directory where tpkg.yml lives). Whatever your
+datascript script outputs will be fed to the tpkg external script. We envision
+this being particularly useful in calculating kernel parameters based on
+things like the amount of physical memory in a system.
+</p>
+
+<h2>External Scripts</h2>
+
+<p>
+The external scripts live in the /usr/lib/tpkg/externals directory.  So using
+the example above with the external named "user" that would trigger a call to
+/usr/lib/tpkg/externals/user.  That script will be passed the package filename
+as the first command line argument and the operation being performed (either
+'install' or 'remove') as the second argument.  The data associated with the
+external will be passed to the script on stdin.  Any output is ignored, as is
+the exit value of the script.  Note that an upgrade is implemented in tpkg as
+a remove of the old version followed by an install of the new version, so
+externals are called as appropriate.  I.e. externals do not need to implement
+an 'upgrade' operation.
+</p>
+
+<p>
+Note that if your script does not need the data passed in on stdin you should
+dump it to /dev/null.  Otherwise you might intermittently generate a SIGPIPE
+error in tpkg if your script exits before tpkg finishes writing data to it.
+Something like <tt>cat &gt; /dev/null</tt> at an appropriate place in your
+script should do the trick.
+</p>
+
+<p>
+The TPKG_HOME environment variable will be set with the tpkg base directory,
+/opt/tpkg by default, in the environment of external scripts when they are
+executed.
+</p>

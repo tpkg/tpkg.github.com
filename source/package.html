@@ -1,0 +1,486 @@
+<h3>Directory Structure</h3>
+
+<p>
+The first step in making a package is to make a working directory to contain
+your package contents. You'll place copies of any files and directories that
+belong in your package into this working directory, along with the metadata
+for your package. Generally you should automate this process so that members
+of your team can easily build the package. The working directory should be
+temporary, i.e. your package build process should make the working directory,
+copy files into it, make the package, and remove the working directory. We'll
+use <tt>/tmp/mypackage</tt> in our example.
+</p>
+
+<pre>mkdir /tmp/mypackage</pre>
+
+<p>
+Packages can contain "relocatable" or "non-relocatable" files. When you use
+tpkg it has a "base" directory where it stores its own state and where it
+installs files by default. The base directory is <tt>/opt/tpkg</tt> by
+default. However, files may need to be installed in a specific location if
+there are hard-coded references to them. In that case they should be packaged
+as non-relocatable. Within your working directory relocatable files go into a
+<tt>reloc</tt> directory, non-relocatable files go into a <tt>root</tt>
+directory. As a best practice packages should only contain one or the other.
+A package with non-relocatable files can't really be relocated so it doesn't
+make sense for it to also contain relocatable files.
+</p>
+
+<pre>mkdir /tmp/mypackage/reloc</pre>
+
+<p>
+or
+</p>
+
+<pre>mkdir /tmp/mypackage/root</pre>
+
+<p>
+If, for example, you create <tt>/tmp/mypackage/reloc/bin/mybin</tt> it will be
+installed in /opt/tpkg/bin/mybin by default. If you create
+<tt>/tmp/mypackage/root/usr/sbin/mysbin</tt> it will be installed in
+/usr/sbin/mysbin.
+</p>
+
+<h3>Permissions and Ownership</h3>
+
+<p>
+The permissions files in your working directory will be captured when the
+package is made, and restored when the package is installed. The ownership
+will be default to root. If you want more granular control, you can specify
+the desired default permissions and ownership, and/or the permissions and
+ownership for individual files in the package metadata (see below).
+</p>
+
+<h3>Metadata</h3>
+
+<p>
+The metadata for your package consists of information like the package name,
+version, description, dependencies, etc. With the initial release of tpkg,
+this information is contained in a tpkg.yml. The tpkg.yml file should be at
+the top of your package directory structure, <tt>/tmp/mypackage/tpkg.yml</tt>
+in our example.
+</p>
+
+<p>
+  Note: older versions of tpkg supported a tpkg.xml file as an alternative to
+  tpkg.yml.  The XML format has been deprecated and should not be used for any
+  new packages.
+</p>
+
+<h3>Metadata Example</h3>
+
+<p>
+Here's an example of a minimal but functional tpkg.yml file:
+</p>
+
+<pre>
+name: mypkg
+version: 1.0
+maintainer: user@example.com
+description: mypkg provides gee-whiz and fizz-bat functionality</pre>
+
+<p>
+Name, version, maintainer and description are the only required items. Any of
+the other tpkg.yml items described below are optional.
+</p>
+
+<h3>Metadata Reference</h3>
+
+<p>
+The format of tpkg.yml is as follows:
+</p>
+
+<pre>name: Name</pre>
+
+<p>
+Name of the package.
+</p>
+
+<pre>version: Version</pre>
+
+<p>
+Version of the software in the package. Versions consist of numbers or strings
+separated by dots, and must begin with a digit. I.e. "1", "1.0", "5.4.6" and
+"5.4.6a" are all valid versions, while qa.1.2 or a.b are not. Our version
+comparison routine should handle just about any version format. I.e. "5.10"
+is greater than "5.9", "2.6" is greater than "2.5.1", "5.9b" is greater than
+"5.9a", and "5.10a" is greater than "5.9b".
+</p>
+
+<p>
+<strong>Note:</strong> With yaml, 5.10 is the same as 5.1
+(numerically speaking). So if you want to explicitly define your version as a
+"5.10" string, then you need to put quotes around it.
+</p>
+
+<pre>package_version: Package version</pre>
+
+<p>
+Optional: in the event that the package represents software with its own
+version number this can be used to specify multiple revisions of the package
+for a given upstream version.  I.e. say you are packaging version 7.21.2 of
+curl.  You would set version to 7.21.2 and package_version to 1.  You
+distribute that package to some systems then notice an error in your tpkg.yml.
+You fix that error and increment package_version to 2, but version remains
+7.21.2 because it is still the same version of curl.  The package version has
+the same format as the version field.
+</p>
+
+<pre>maintainer: Maintainer</pre>
+
+<p>
+The package's maintainer(s). The use of an email address or URL is recommended
+so that users can get more information if needed.
+</p>
+
+<pre>operatingsystem: [OS]</pre>
+
+<p>
+Optional. If this item is not specified, the package is assumed to work on all
+operating systems. If specified, [OS] needs to be an array of 1 or more
+elements. Examples of recognized values:
+</p>
+
+<ul>
+  <li>[RedHat-4, RedHat-5, CentOS-4, CentOS-5]</li>
+  <li>[FreeBSD-7]</li>
+  <li>[Solaris-5.10]</li>
+  <li>[Darwin-10.5] (Mac OS X)</li>
+</ul>
+
+<p>
+<strong>Note:</strong> YAML requires a space after each comma in a list.  I.e.
+[RedHat-4, RedHat-5] is valid, [RedHat-4,RedHat-5] is not.
+</p>
+
+<pre>architecture: [Arch]</pre>
+
+<p>
+Optional. If this item is not specified, the package is assumed to work on all
+architectures. If specified, [Arch] needs to be an array of 1 or more
+elements. Examples of recognized values:
+</p>
+
+<ul>
+  <li>[i686, x86_64] (32-bit and 64-bit Linux)</li>
+  <li>[i386] (32-bit FreeBSD)</li>
+  <li>[i86pc] (Solaris x86)</li>
+  <li>[sun4u] (Solaris UltraSPARC)</li>
+</ul>
+
+<p>
+<strong>Note:</strong> YAML requires a space after each comma in a list.
+I.e. [i686, x86_64] is valid, [i686,x86_64] is not.
+</p>
+
+<pre>description: Description</pre>
+
+<p>
+Free-form description of package.
+</p>
+
+<pre>bugreporting: Bugreporting info</pre>
+
+<p>
+Optional, free-form info about where and how to report bugs against the
+package. The use of an email address or URL is recommended.
+</p>
+
+<pre>
+  dependencies:
+  - name: dep1
+    minimum_version: 1.0
+    maximum_version: 2.0
+    minimum_package_version: 0
+    maximum_package_version: 10
+    native: true
+  - name: dep2
+    minimum_version: 1.3
+    maximum_version: 2.1
+  - name: dep3
+    allowed_versions: 1.4.*</pre>
+
+<p>
+The dependencies section is optional, and dependency may be specified 0 or
+more times to indicate dependencies on other packages. The minimum and maximum
+versions are all optional. The highest version of the package found which
+otherwise meets the requirements will be used. The optional native tag
+indicates a base system dependency. Tpkg will use your operating system's
+packaging tools (rpm/yum, dpkg/apt, etc.) to query and install native
+dependencies. Dependencies without the native flag refer to other tpkgs.
+</p>
+
+<p>
+The allowed_versions tag allows you to specify version dependency as wildcard.
+In the example above, any version of dep3 that begins with 1.4 will satisfy
+the dependency requirement. 
+</p>
+
+<p>
+<strong>Note:</strong> There is a difference between minimum_version and
+minimum_package_version, and likewise maximum_version and
+maximum_package_version.  See the descriptions of version and package_version
+above if you're uncertain about the distinction.
+</p>
+
+<pre>
+  conflicts:
+  - name: dep1
+    minimum_version: 1.0
+    maximum_version: 2.0
+    minimum_package_version: 0
+    maximum_package_version: 10
+    native: true
+  - name: dep2
+    minimum_version: 1.3
+    maximum_version: 2.1</pre>
+
+<p>
+The conflicts section is optional, and conflict may be specified 0 or more
+times to indicate conflicts with other packages. The name, minimum_version,
+maximum_version, minimum_package_version, maximum_package_version are
+identical to how they are used in the dependencies section.
+</p>
+
+
+<pre>
+  externals:
+  - name: user
+    data: myuser
+  - name: nfs
+    data: |
+      local  -ro,nosuid  mynfs:/export/local
+  - name: sysctl
+    datascript: sysctl.sh</pre>
+
+<p>
+The externals section is optional. The default set of externals scripts does
+simple things like run the <tt>useradd</tt> program when a user is requested
+and <tt>groupadd</tt> when a group is requested.  The externals scripts are
+easily customized to interact appropriately with your environment.  The
+externals feature is used in the tpkg author's environment as a way for
+packages to request operating system configuration from our OS configuration
+management system <a href="http://etch.sourceforge.net/">Etch</a>, including
+accounts, NFS mounts, kernel settings, etc. See
+<a href="os_configuration_via_etch.html">OS configuration via etch</a>.
+
+</p>
+<pre>
+  files:
+  file_defaults:
+    posix:
+      owner: root
+      group: root
+      perms: 0444
+  files:
+    - path: path/to/file
+      encrypt: {}
+      posix:
+        owner: root
+        group: root
+        perms: 0400
+    - path: path/to/file2
+      encrypt: 
+        precrypt: true
+        algorithm: aes-128-cbc
+      posix:
+        owner: root
+        group: root
+        perms: 0400
+    - path: etc/init.d/myinit1
+      init: {}
+    - path: etc/init.d/myinit2
+      init:
+        start: 90
+        levels: [2, 3, 4, 5]   &lt;--- must have spaces in between. YAML is whitespace sensative
+    - path: etc/init.d/myinit3
+      init:
+        start: 90
+        levels: []
+    - path: etc/cron.d/mycron
+      crontab: {}
+    - path: etc/crond.d/myothercron
+      crontab: 
+        user: somebody
+    - path: dir1/myconf
+      config: true</pre>
+
+<p>
+Describes permissions and ownership to assign to the files in the package.
+Optional, as files will be given the permissions and ownership they possess in
+the tarball if not specified, and packages may contain no files (i.e. a
+metapackage that exists merely to express dependencies).
+</p>
+
+<p>
+The encrypt field requests that the file be encrypted with a symmetric
+encryption algorithm (aes-256-cbc by default). You will be prompted for a
+passphrase when you make the package and a passphrase when you install the
+package. You will be able to install the unencrypted files in a package
+without the passphrase. If the encrypt field includes the "precrypt" flag,
+then the file is assumed to already be encrypted. It will be included in the
+package as-is, but decrypted at install time. This allows you to store the
+already encrypted file in your revision control system. You can encrypt files
+with
+<tt>openssl enc -aes-256-cbc -salt -in &lt;unencryptedfile&gt; -out &lt;encryptedfile&gt;</tt>.
+All precrypt files in a package must be encrypted with the same passphrase.
+Files marked as precrypt are copied as-is into the package, so you won't need
+the passphrase to make the package. In addition to encrypting files, tpkg
+allows users to specify a directory as the path value. In this case, tpkg will
+encrypt ALL the files that are inside that directory. This feature does not
+work with the precrypt flag.
+</p>
+
+<p>
+The init field indicates that the file is an init script. The init script is
+expected to follow Unix convention and respond to the arguments of start,
+stop, restart, reload and status. Here's a
+<a href="init_script.html">sample init script</a>. The scripts will be hooked
+into the system init process. The default settings for the runlevels in which
+the init script should be run (on systems that support that sort of thing)
+and the point in the init process the script should run will be applied if you
+specify an empty element like "myinit1" in the example above. Although the
+defaults are fine for most users, within the init section you can specify at
+what point in the init process the init script should run, and in what
+runlevels it should run. In this example above, "myinit2" would be linked into
+/etc/rc2.d, rc3.d, etc. as S90myinit2. If levels is specified as empty
+(e.g myinit3) the init script will not be linked into any runlevels. This is
+useful if you want to specify an init script so that you can manually start
+the app via tpkg start foo but don't want the app to start automatically at
+boot time.
+</p>
+
+<p>
+The crontab flag indicates that the file is a crontab.  On systems that
+support the /etc/cron.d style of crontabs (like Red Hat and CentOS) that
+mechanism will be used by default, which means that you can specify the user
+to run the job as and the address to email output to, on a per-job basis
+within the file.  You don't specify them to tpkg.  On systems that don't
+support the /etc/cron.d mechanism then you must specify a user and tpkg will
+append your crontab to that user's crontab file (and remove it if the package
+is removed).  Here's an <a href="crontab_crond.html">example crontab</a> for
+systems that support /etc/cron.d style crontabs, and an
+<a href="crontab_basic.html">example crontab</a> for other systems.
+</p>
+
+<p>
+<strong>Notes:</strong> The above example is for a relocatable package. If you
+are making a root package (files are in /root/opt/tpkg) then you need to
+specify the full path to the file. For example, you will need to specify the
+following path for the "myinit1" script
+</p>
+
+<pre>- path: /opt/tpkg/etc/init.d/myinit1</pre>
+
+<p>
+The config field indicates that the file is a configuration file. When
+removing a package, if a configuration file has been modified, tpkg will not
+remove that file. When installing a package, if the configuration file already
+exists, tpkg will save the new file as filename.tpkgnew. This approach allows
+users to upgrade packages and not have the new packages overwrite their
+modified configuration files.
+</p>
+
+<h3>Scripts: preinstall, postinstall, preremove, postremove</h3>
+
+<p>
+If you include any of these scripts in your package they will be run at the
+appropriate point in package installation/removal. These scripts need to be at
+the same level as your tpkg.yml file and reloc|root dir. An example path is
+<tt>/tmp/mypackage/preinstall</tt>. The scripts can be written in any language
+you like as long as they will run on any box on which your package might be
+installed. Be sure they are executable. If the preinstall or preremove script
+fails the operation (install/remove) will be aborted. If the postinstall or
+postremove script fails a warning will be shown but the operation will continue.
+</p>
+
+<p>
+The TPKG_HOME environment variable will be set with the tpkg base directory,
+/opt/tpkg by default, in the environment when your scripts are executed.  This
+allows your scripts to adjust paths as necessary, particularly for relocatable
+packages.
+</p>
+
+<h3>Setting env variables</h3>
+
+<p>
+Notes: Currently, this feature is only supported on Red Hat Linux, Debian and Solaris
+</p>
+
+<p>
+If you want your package to set certain env variables, set up your package to
+create a script inside /opt/tpkg/etc/profile.d. Inside this script, set the
+env variables that you want to set. For example, with my jdk package, I've
+created a java.sh script inside /opt/tpkg/etc/profile.d that does export
+JAVA_HOME=where_my_pkg_is_installed. This will set the JAVA_HOME env variable
+for all the users.
+</p>
+
+<h3>Making the Package</h3>
+
+<p>
+Run <tt>tpkg --make /tmp/mypackage</tt>. The name of the resulting package
+file will be displayed.
+</p>
+
+<p>
+Optionally, you can choose to compress the package via the --compress option. For example:
+</p>
+
+<pre>
+tpkg -m /tmp/mypackage --compress  # defaults to gzip
+tpkg -m /tmp/mypackage --compress=gzip
+tpkg -m /tmp/mypackage --compress=bz2
+tpkg -m /tmp/mypackage --compress=no  # Disable compression</pre>
+
+<p>
+Notes:
+</p>
+
+<ul>
+  <li>
+    The compression feature assumes that you have gzip or bzip2 installed in
+    your PATH.
+  </li>
+  <li>
+    This feature was introduced in version 1.20. So it will not work if
+    you're trying to install a compressed package using an older tpkg
+    client.
+  </li>
+</ul>
+
+<h3>Cleanup</h3>
+
+<p>
+Remove your working directory
+</p>
+
+<h2>Pushing Your Package To The Distribution Servers</h2>
+
+<p>
+This assumes that you have already set up a
+<a href="package_server.html">package server</a> and a
+<a href="reporting_server.html">reporting server</a>.
+</p>
+
+<p>
+There are two ways for pushing out your packages to the servers: using the
+web browser, or using the tpkg_uploader CLI tool.
+</p>
+
+<ul>
+  <li>Using web browser
+    <ul>
+      <li>Go to http://where_your_reporting_server_is_installed/uploads/new</li>
+      <li>Select and upload your package file</li>
+    </ul>
+  </li>
+  <li>Using tpkg_uploader
+    <ul>
+      <li>Get the script from here: <a href="https://github.com/tpkg/client/blob/master/bin/tpkg_uploader">https://github.com/tpkg/client/blob/master/bin/tpkg_uploader</a></li>
+      <li>This script assumes you have curl installed on your machine</li>
+      <li>Edit the script, set the appropriate values for authentication_url and tpkg_upload_url. They should be http://where_your_reporting_server_is_installed/login and http://where_your_reporting_server_is_installed/uploads/create</li>
+      <li>run <tt>tpkg_uploader -f file_you_want_to_upload</tt></li>
+    </ul>
+  </li>
+</ul>

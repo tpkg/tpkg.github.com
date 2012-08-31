@@ -1,0 +1,101 @@
+<h1>Introduction</h1>
+
+<p>
+This page attempts to document important aspects of the internals of tpkg as a
+guide for developers new to the project.
+</p>
+
+<h1>Package Format</h1>
+
+<p>
+Packages consist of two nested tarballs.  The top level directory of the outer
+tarball generally matches the package filename with the ".tpkg" extension
+removed.  The outer tarball contains the inner tarball and a checksum.xml file
+used to verify the integrity of the inner tarball.  The inner tarball may be
+compressed.  For example:
+</p>
+
+<pre>
+% tar tf ruby-1.8.7-p352-1-darwin107-x86_64.tpkg
+ruby-1.8.7-p352-1-darwin107-x86_64/
+ruby-1.8.7-p352-1-darwin107-x86_64/checksum.xml
+ruby-1.8.7-p352-1-darwin107-x86_64/tpkg.tar.gz</pre>
+
+<p>
+The inner tarball is named tpkg.tar or tpkg.tar.gz or similar, depending on
+the compression used.  The top level directory of the inner tarball is "tpkg".
+In that toplevel directory will be a tpkg.yml or tpkg.xml (deprecated) file,
+perhaps other metadata and supporting files like pre or post install scripts,
+and then the package files in a root or reloc directory, depending on whether
+the user built a relocatable package or not.  The contents of the inner tarball
+are provided entirely by the user (it is a tar of whatever directory they passed
+to "tpkg --make"), so it could contain arbitrary other directories or contents
+that might be ignored by tpkg.  tpkg does some sanity checking of the
+directory, but generally gives the user freedom to include arbitrary contents
+in the package.  Here's an example showing the structure of the inner tarball,
+and how to use tar to examine the inner tarball without unpacking it first.
+</p>
+
+<pre>
+% tar -O - -xf ruby-1.8.7-p352-1-darwin107-x86_64.tpkg ruby-1.8.7-p352-1-darwin107-x86_64/tpkg.tar.gz | tar ztf -
+tpkg/
+tpkg/tpkg.yml
+tpkg/root/
+[snip]</pre>
+
+<h1>req</h1>
+
+<p>
+The concept of a "requirement" or "request" is widely used in tpkg.  These are
+usually stored in a variable named something like "req".  A req represents a
+set of requirements for a package.  These requirements can either come from a
+dependency in another package, or via a user's request on the command line.
+I.e. "tpkg -i foo=2.4=6" includes a request for "foo=2.4=6".
+</p>
+
+<p>
+A req is stored as a Hash.  For example, here's the req for "foo=2.4=6":
+</p>
+
+<pre>
+&gt;&gt; Tpkg.parse_request('foo=2.4=6')
+=&gt; {:name=&gt;"foo", :minimum_version=&gt;"2.4", :maximum_version=&gt;"2.4", :minimum_package_version=&gt;"6", :maximum_package_version=&gt;"6", :type=&gt;:tpkg}</pre>
+
+<h1>pkg</h1>
+
+<p>
+Each installed or available package is represented internally as a "pkg".  A
+pkg is stored as a Hash.  It has the following fields:
+</p>
+
+<dl>
+  <dt>:source</dt>
+  <dd>
+    <p>
+      One of :currently_installed, :native_installed, :native_available or the
+      file, directory or URL that is the source for an available package
+    </p>
+  </dd>
+  <dt>:metadata</dt>
+  <dd>
+    <p>
+      Instance of Metadata (see below) for the package
+    </p>
+  </dd>
+  <dt>:prefer</dt>
+  <dd>
+    <p>
+      Boolean to indicate that this currently installed package should be
+      preferred over newer versions that might be available.  Set to true by
+      default for all currently installed packages, but then set to false if
+      the user has requested an upgrade for that particular package.
+    </p>
+  </dd>
+</dl>
+
+<h1>Metadata</h1>
+
+<p>
+The Metadata class represents the metadata from a package.  It abstracts the
+differences between YAML and XML metadata.
+</p>

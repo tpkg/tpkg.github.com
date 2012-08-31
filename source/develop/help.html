@@ -1,0 +1,24 @@
+<p>
+Like all Open Source projects tpkg is a work-in-progress.  We always welcome
+bug fixes and enhancements to existing features (although you probably should
+check in on the tpkg-devel mailing list before making major changes just to
+make sure someone else isn't already working on the same thing).  But
+sometimes it is nice to work on something new.  As such here is a list of
+things that we'd love to see someone pick up and work on.
+</p>
+
+<h2>Ports System</h2>
+
+<p>
+We have a
+<a href="https://github.com/tpkg/pkgs">set of build scripts</a> to build tpkgs
+for a variety of major Open Source applications (Perl, Ruby, etc.)  However,
+that setup is a pretty big hack.  Ideally we'd have some sort of ports-like
+system that would output tpkgs.  Even more ideally this would be integrated
+into existing ports systems on various platforms so that we could take
+advantage of the work of others on getting software to compile on those
+various platforms.  I.e. in the FreeBSD ports system we'd add a "make tpkg"
+target.  MacPorts can already produce a
+<a href="http://guide.macports.org/#using.binaries.binary-packages">variety of package formats</a>,
+it would be nice to add tpkg to that list.
+</p>

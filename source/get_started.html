@@ -1,0 +1,88 @@
+<p>
+Here are the basic steps to getting a development copy of tpkg up and running.
+Once you're ready to progress to a production-grade install see our
+<a href="production.html">production setup</a> page.
+</p>
+
+<h2>Client</h2>
+
+<h3>Via RubyGems</h3>
+<p>
+Our recommended installation process is via RubyGems:
+</p>
+<p>
+<tt>gem install tpkg</tt>
+</p>
+
+<h3>MacPorts</h3>
+<p>
+On a Mac the MacPorts system provides an alternative easy installation:
+</p>
+<p>
+<tt>port install tpkg</tt>
+</p>
+
+<h3>The Hard Way</h3>
+<p>
+If you'd prefer, you can download the tpkg source tarball and run from there.
+</p>
+<p>
+<a href="https://github.com/tpkg/client/downloads">Download tpkg</a> and unpack it.
+</p>
+<p>
+If you add the client directory to your PATH you can run tpkg without
+installing it. Since you're running the client without building and installing
+the client package you'll have to resolve dependencies manually for now. The
+client depends on the
+<a href="http://www.reductivelabs.com/projects/facter/">facter</a> library.
+This
+<a href="http://reductivelabs.com/trac/puppet/wiki/DownloadingPuppet">page</a>
+has links to facter packages for a variety of platforms. If you have Ruby Gems
+you can install facter with <tt>gem install facter</tt>.
+</p>
+
+<h2>Configuration</h2>
+
+<p>
+Tpkg will use /opt/tpkg as the base directory by default, which is where it
+will install relocatable packages and store its own state. If you want to test
+out tpkg without root privileges you can create ~/.tpkg.conf:
+</p>
+
+<pre>
+base = /home/you/tpkgbase</pre>
+
+<h2 id="DemoPackage">Demo Package</h2>
+
+<p>
+Here are some instructions for making up a quick package and installing it.
+</p>
+
+<ul>
+  <li><tt>mkdir /tmp/demopkg</tt></li>
+  <li>Create /tmp/demopkg/tpkg.yml:
+<pre>name: demopkg
+version: 1.0
+maintainer: Nobody
+description: Some description</pre></li>
+  <li><tt>mkdir /tmp/demopkg/reloc</tt></li>
+  <li><tt>touch /tmp/demopkg/reloc/demofile</tt></li>
+  <li><tt>tpkg --make /tmp/demopkg</tt></li>
+  <li><tt>tpkg --install /tmp/demopkg-1.0.tpkg</tt></li>
+  <li><tt>rm -rf /tmp/demopkg /tmp/demopkg-1.0.tpkg</tt></li>
+</ul>
+
+<p>
+The install should have created /home/you/tpkgbase/demofile.
+<tt>tpkg --qa</tt> should list the package as installed,
+<tt>tpkg --ql demopkg</tt> should list the files in the package, etc.
+Experiment with more complex packages, check out the
+<a href="package.html">packaging documentation</a> page for more info, or
+consult the pkgs directory in the distribution for scripts which build
+complete packages of common applications like Perl, Ruby, etc.
+</p>
+
+<p>
+To see what other tpkg operations are available, please consult the man page
+or use the tpkg -h command.
+</p>
