@@ -10,24 +10,18 @@ This page documents the process of releasing a new version of tpkg to the public
   <li>Update version in VERSION file, commit</li>
   <li>Tag the release with <tt>git tag -a v2.0.0</tt></li>
   <li>Push your tag to github with <tt>git push --tags</tt></li>
-
-  <li>Run <tt>rake dist</tt> (you can just skip through the PGP/GPG step for now if you don't have a public PGP key)</li>
-  <li>Go to the <a href="https://sourceforge.net/projects/tpkg/files">project file manager</a></li>
-  <li>Open the tpkg folder</li>
-  <li>Choose Add Folder, name it with the version number</li>
-  <li>Open the new folder</li>
-  <li>Upload the release tarball and the checksum files</li>
-  <li>Click the i icon next to the tarball, click the Select All link under Default Download, click Save</li>
-  <li>Go to Develop-&gt;Project Admin-&gt;Feature Settings-&gt;<a href="https://sourceforge.net/news/submit.php?group_id=245750">Project News Submit</a> from the <a href="http://sourceforge.net/projects/tpkg">project page</a> and submit a little blurb about the release</li>
-  <li>Go to the <a href="http://freshmeat.net/projects/tpkg">tpkg page</a> on freshmeat, hit the Submit a release link and add the release
+  <li><tt>git archive -o tpkg-client-2.3.3.tar.gz --prefix tpkg-client-2.3.3/ v2.3.3</tt></li>
+  <li>Upload the release tarball at <a href="https://github.com/tpkg/client/downloads">https://github.com/tpkg/client/downloads</a></li>
+  <li>Go to the <a href="http://freshmeat.net/projects/tpkg">tpkg page</a> on
+    freshmeat, hit the Submit a release link and add the release
     <ul>
-      <li>Generally you can use the same text for project news and freshmeat.  Freshmeat requires a conversational writeup, which works well for the project news blurb as well</li>
+      <li>Freshmeat requires a conversational writeup</li>
     </ul>
   </li>
   <li>Send an email to <a href="https://lists.sourceforge.net/lists/listinfo/tpkg-users">tpkg-users</a> announcing the release.  This will generally be more verbose and technical than the SF news and freshmeat blurbs.</li>
-  <li>Change to tag directory and run <tt>rake macport</tt></li>
+  <li>Run <tt>rake macport</tt></li>
   <li>Submit <a href="https://trac.macports.org/newticket">MacPorts ticket</a> requesting update of tpkg port, attach a diff of $PWD/Portfile and the generated $TMPDIR/Portfile</li>
-  <li>Copy $TMPDIR/Portfile to trunk and commit to subversion</li>
-  <li>Change to tag directory and run <tt>rake gem</tt></li>
+  <li>Copy $TMPDIR/Portfile to your git working copy and commit</li>
+  <li>Run <tt>rake gem</tt></li>
   <li><tt>gem push $TMPDIR/tpkg-version.gem</tt></li>
 </ul>
