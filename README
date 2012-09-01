@@ -1,0 +1,7 @@
+This is the repository for the tpkg website at http://tpkg.github.com/
+
+The actual HTML files are generated via a simple templating system located in
+the source/ directory.  Edit files under source/ as necessary, run the gensite
+script, and commit your changes.
+
+Pull requests for documentation enhancements of any sort are very welcome.
