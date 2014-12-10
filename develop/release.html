@@ -61,8 +61,8 @@ This page documents the process of releasing a new version of tpkg to the public
     </ul>
   </li>
   <li>Send an email to <a href="https://lists.sourceforge.net/lists/listinfo/tpkg-users">tpkg-users</a> announcing the release</li>
-  <li>Run <tt>rake gem</tt></li>
-  <li><tt>gem push $TMPDIR/tpkg-version.gem</tt></li>
+  <li>Run <tt>rake build</tt></li>
+  <li><tt>gem push pkg/tpkg-&lt;version&gt;.gem</tt></li>
   <li>Run <tt>rake macport</tt></li>
   <li>Submit <a href="https://trac.macports.org/newticket">MacPorts ticket</a> requesting update of tpkg port, attach a diff of $PWD/Portfile and the generated $TMPDIR/Portfile</li>
   <li>Copy $TMPDIR/Portfile to your git working copy and commit</li>
